@@ -1,0 +1,1000 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0f9d9a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="نرسیکا">
+<title>اپلیکیشن نرسیکا | خدمات پرستاری و گردشگری سلامت</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lalezar&family=Vazirmatn:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --teal: #0f9d9a;
+  --teal-d: #0a7471;
+  --teal-l: #e6f6f5;
+  --navy: #12284c;
+  --gold: #c9a227;
+  --bg: #f3f6f9;
+  --card: #ffffff;
+  --line: #e2e8f0;
+  --txt: #1e293b;
+  --mut: #64748b;
+  --red: #dc2626;
+  --blue: #1d4ed8;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  font-family: 'Vazirmatn', Tahoma, sans-serif;
+  background: var(--bg);
+  color: var(--txt);
+  line-height: 1.75;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+body.modal-open { overflow: hidden; }
+
+/* شبیه‌ساز قاب اپلیکیشن در مانیتورهای بزرگ و تمام‌صفحه در موبایل */
+.app-shell {
+  width: 100%;
+  max-width: 540px;
+  min-height: 100dvh;
+  margin: 0 auto;
+  background: var(--bg);
+  position: relative;
+  padding-bottom: calc(82px + var(--safe-b));
+  box-shadow: 0 0 40px rgba(18, 40, 76, 0.08);
+}
+
+@media (min-width: 768px) {
+  .app-shell { max-width: 960px; }
+}
+
+/* هدر بالایی اپلیکیشن (App Bar) */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 10px 16px;
+}
+
+.app-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-brand img {
+  height: 40px;
+  width: auto;
+  mix-blend-mode: multiply;
+}
+
+.app-brand-title {
+  font-weight: 800;
+  font-size: 1.05rem;
+  color: var(--navy);
+  line-height: 1.2;
+}
+
+.app-brand-sub {
+  font-size: 0.72rem;
+  color: var(--teal-d);
+  font-weight: 600;
+}
+
+.app-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  background: var(--teal-l);
+  color: var(--teal-d);
+  border: 1px solid rgba(15, 157, 154, 0.25);
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+}
+
+.icon-pill.call {
+  background: #fef2f2;
+  color: var(--red);
+  border-color: #fecaca;
+}
+
+/* نوار زبان‌ها با اسکرول افقی نرم */
+.lang-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px dashed var(--line);
+  scrollbar-width: none;
+}
+.lang-strip::-webkit-scrollbar { display: none; }
+
+.lang-chip {
+  flex: none;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  color: var(--mut);
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+.lang-chip.active {
+  background: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+}
+
+/* بخش‌های محتوا */
+.app-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 18px; }
+
+/* بنر خوش‌آمدگویی و جستجوی سریع */
+.hero-card {
+  background: linear-gradient(145deg, var(--navy) 0%, #163b6d 60%, var(--teal-d) 100%);
+  color: #fff;
+  border-radius: 22px;
+  padding: 20px 18px;
+  box-shadow: 0 12px 28px rgba(18, 40, 76, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-card h1 {
+  font-size: 1.35rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  line-height: 1.4;
+}
+
+.hero-card h1 span { color: #5eead4; }
+
+.hero-card p {
+  font-size: 0.84rem;
+  opacity: 0.9;
+  margin-bottom: 14px;
+}
+
+.app-search {
+  display: flex;
+  gap: 6px;
+  background: #fff;
+  padding: 5px;
+  border-radius: 14px;
+}
+
+.app-search select {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.88rem;
+  color: var(--txt);
+  padding: 8px;
+  outline: none;
+  min-width: 0;
+}
+
+.app-search button {
+  background: var(--teal);
+  color: #fff;
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* دکمه‌های اقدام سریع (Quick Actions) */
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.q-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 12px;
+  text-align: start;
+  cursor: pointer;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  transition: transform 0.15s ease;
+}
+.q-btn:active { transform: scale(0.97); }
+
+.q-btn.urgent {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.q-btn.nurse {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.q-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.2rem;
+  flex: none;
+}
+.urgent .q-icon { background: var(--red); color: #fff; }
+.nurse .q-icon { background: var(--navy); color: #fde047; }
+
+.q-title { font-size: 0.85rem; font-weight: 800; color: var(--navy); display: block; }
+.urgent .q-title { color: var(--red); }
+.q-sub { font-size: 0.72rem; color: var(--mut); display: block; }
+
+/* هشدار ۱۱۵ */
+.emergency-strip {
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
+  color: #9f1239;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.emergency-strip a {
+  background: var(--red);
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  text-decoration: none;
+  flex: none;
+}
+
+/* بنر تصویری اپلیکیشن */
+.app-banner {
+  width: 100%;
+  border-radius: 18px;
+  display: block;
+  box-shadow: 0 8px 20px rgba(18, 40, 76, 0.08);
+}
+
+/* تیتر بخش‌ها */
+.sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.sec-head h2 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--navy);
+}
+.sec-badge {
+  font-size: 0.72rem;
+  background: var(--teal-l);
+  color: var(--teal-d);
+  padding: 2px 10px;
+  border-radius: 99px;
+  font-weight: 700;
+}
+
+/* شبکه خدمات (۲ ستونه در موبایل، ۴ ستونه در تبلت) */
+.srv-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+@media (min-width: 768px) {
+  .srv-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.srv-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.2s;
+}
+.srv-item:active { transform: scale(0.97); border-color: var(--teal); }
+.srv-ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--teal-l);
+  display: grid;
+  place-items: center;
+  font-size: 1.15rem;
+}
+.srv-item h3 { font-size: 0.86rem; font-weight: 700; color: var(--navy); }
+.srv-item p { font-size: 0.74rem; color: var(--mut); line-height: 1.5; }
+
+/* اسلایدر افقی مراحل (Horizontal Scroll Cards) */
+.h-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.h-scroll::-webkit-scrollbar { display: none; }
+
+.step-card {
+  flex: 0 0 210px;
+  scroll-snap-align: start;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 14px;
+}
+.step-num {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.step-card h3 { font-size: 0.88rem; color: var(--navy); margin-bottom: 4px; }
+.step-card p { font-size: 0.76rem; color: var(--mut); }
+
+/* کارت گردشگری سلامت */
+.tourism-card {
+  background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+  border: 1px solid #bfdbfe;
+  border-radius: 18px;
+  padding: 18px;
+}
+.tourism-card h3 { font-size: 1.05rem; color: var(--navy); margin-bottom: 6px; }
+.tourism-card p { font-size: 0.82rem; color: var(--txt); margin-bottom: 12px; }
+.btn-full {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  border: 0;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.btn-blue { background: var(--blue); color: #fff; }
+.btn-teal { background: var(--teal); color: #fff; }
+.btn-red { background: var(--red); color: #fff; }
+
+/* سوالات متداول آکاردئونی */
+details {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+summary { font-size: 0.86rem; font-weight: 700; color: var(--navy); cursor: pointer; }
+details p { font-size: 0.8rem; color: var(--mut); margin-top: 8px; }
+
+/* کارت اطلاعات تماس و آدرس */
+.info-card {
+  background: var(--navy);
+  color: #e2e8f0;
+  border-radius: 18px;
+  padding: 18px;
+  font-size: 0.82rem;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+.info-row:last-child { border-bottom: 0; }
+.copy-pill {
+  background: var(--teal);
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.74rem;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  flex: none;
+}
+
+/* نوار ناوبری پایین اپلیکیشن (Bottom Tab Bar) */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 540px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  align-items: center;
+  padding: 6px 4px calc(6px + var(--safe-b));
+  z-index: 90;
+  box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.05);
+}
+@media (min-width: 768px) {
+  .bottom-nav { max-width: 960px; }
+}
+
+.nav-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: 0;
+  color: var(--mut);
+  font-family: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  padding: 4px 0;
+}
+.nav-tab.active { color: var(--teal); font-weight: 800; }
+.nav-tab span.ic-tab { font-size: 1.25rem; line-height: 1.2; }
+
+.nav-tab-center {
+  position: relative;
+  top: -14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+.center-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--red), #b91c1c);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 1.4rem;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+  border: 3px solid #fff;
+}
+.nav-tab-center span {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--red);
+  margin-top: 2px;
+}
+
+/* پاپ‌آپ کشویی از پایین (Bottom Sheet Modal) */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet-overlay.active { display: flex; }
+
+.sheet-box {
+  background: #fff;
+  width: 100%;
+  max-width: 540px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  border-radius: 24px 24px 0 0;
+  padding: 14px 18px calc(24px + var(--safe-b));
+  animation: slideUp 0.25s ease-out;
+}
+@media (min-width: 768px) {
+  .sheet-overlay { align-items: center; padding: 16px; }
+  .sheet-box { border-radius: 22px; max-width: 560px; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.sheet-handle {
+  width: 40px;
+  height: 4px;
+  background: #cbd5e1;
+  border-radius: 99px;
+  margin: 0 auto 12px;
+}
+
+.sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+.sheet-head h3 { font-size: 1.05rem; color: var(--navy); }
+.sheet-close {
+  background: var(--bg);
+  border: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: var(--navy);
+}
+
+.f-group { margin-bottom: 12px; }
+.f-group label { display: block; font-size: 0.82rem; font-weight: 700; margin-bottom: 4px; color: var(--navy); }
+.f-input {
+  width: 100%;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 15px;
+  background: var(--bg);
+  color: var(--txt);
+}
+.f-input:focus { outline: none; border-color: var(--teal); background: #fff; }
+
+.toast {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: #fff;
+  padding: 10px 18px;
+  border-radius: 99px;
+  font-size: 0.82rem;
+  z-index: 300;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  display: none;
+  white-space: nowrap;
+}
+.toast.show { display: block; }
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- App Bar -->
+  <header class="app-header">
+    <div class="app-header-top">
+      <div class="app-brand">
+        <img src="assets/logo.webp" alt="نرسیکا">
+        <div>
+          <div class="app-brand-title">نرسیکا</div>
+          <div class="app-brand-sub" data-i18n="hero_title">مراقبت هوشمند، همراهی مطمئن</div>
+        </div>
+      </div>
+      <div class="app-actions">
+        <a href="tel:02128424742" class="icon-pill call">☎️ پشتیبانی</a>
+        <button type="button" class="icon-pill" onclick="openSheet('authSheet')" data-i18n="btn_login">ورود</button>
+      </div>
+    </div>
+    <div class="lang-strip" aria-label="Language">
+      <button type="button" class="lang-chip active" onclick="setLanguage('fa',this)">🇮🇷 فارسی</button>
+      <button type="button" class="lang-chip" onclick="setLanguage('ar',this)">🇸🇦 العربية</button>
+      <button type="button" class="lang-chip" onclick="setLanguage('en',this)">🇬🇧 English</button>
+      <button type="button" class="lang-chip" onclick="setLanguage('tr',this)">🇹🇷 Türkçe</button>
+      <button type="button" class="lang-chip" onclick="setLanguage('ru',this)">🇷🇺 Русский</button>
+    </div>
+  </header>
+
+  <!-- بدنه اپلیکیشن -->
+  <main class="app-body" id="home-sec">
+
+    <!-- کارت جستجو و شروع سریع -->
+    <section class="hero-card">
+      <h1 data-i18n="hero_title">مراقبت هوشمند، <span>همراهی مطمئن</span></h1>
+      <p data-i18n="hero_desc">اعزام پرستار و مراقب احراز هویت‌شده به منزل و بیمارستان در سراسر کشور</p>
+      <form class="app-search" onsubmit="handleServiceSearch(event)">
+        <select id="svc">
+          <option value="" data-i18n="opt_select">انتخاب نوع خدمت...</option>
+          <option value="پرستار در منزل" data-i18n="o1">پرستار در منزل</option>
+          <option value="مراقبت از سالمند" data-i18n="o2">مراقبت از سالمند</option>
+          <option value="مراقبت پس از جراحی" data-i18n="o3">مراقبت پس از جراحی</option>
+          <option value="همراه بیمار در بیمارستان" data-i18n="o4">همراه بیمار در بیمارستان</option>
+          <option value="مراقبت از کودک" data-i18n="o5">مراقبت از کودک</option>
+          <option value="مراقبت شبانه" data-i18n="o6">مراقبت شبانه</option>
+        </select>
+        <button type="submit" data-i18n="btn_search">درخواست</button>
+      </form>
+    </section>
+
+    <!-- دکمه‌های اقدام سریع -->
+    <div class="quick-grid">
+      <button type="button" class="q-btn urgent" onclick="openSheet('urgentSheet')">
+        <span class="q-icon">🚨</span>
+        <div>
+          <span class="q-title" data-i18n="btn_urgent">ثبت فوری پرستار</span>
+          <span class="q-sub">اعزام سریع و هماهنگی</span>
+        </div>
+      </button>
+      <button type="button" class="q-btn nurse" onclick="openSheet('nurseSheet')">
+        <span class="q-icon">🩺</span>
+        <div>
+          <span class="q-title" data-i18n="coop">همکاری پرستاران</span>
+          <span class="q-sub">ثبت‌نام و ارزیابی</span>
+        </div>
+      </button>
+    </div>
+
+    <!-- نوار هشدار اورژانس -->
+    <div class="emergency-strip">
+      <span>⚠️ در شرایط تهدیدکننده حیات با اورژانس تماس بگیرید.</span>
+      <a href="tel:115">تماس ۱۱۵</a>
+    </div>
+
+    <!-- بنر اصلی -->
+    <img class="app-banner" src="assets/banner-1.webp" alt="خدمات پرستاری نرسیکا">
+
+    <!-- دسته‌بندی خدمات -->
+    <section id="services-sec">
+      <div class="sec-head">
+        <h2 data-i18n="srv_title">خدمات پرستاری و مراقبت</h2>
+        <span class="sec-badge">۱۰ خدمت فعال</span>
+      </div>
+      <div class="srv-grid">
+        <div class="srv-item" onclick="openSheet('urgentSheet','پرستار در منزل')"><span class="srv-ic">🏠</span><h3 data-i18n="s1">پرستار در منزل</h3><p data-i18n="d1">مراقبت تخصصی در محل سکونت</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','پرستار در بیمارستان')"><span class="srv-ic">🏥</span><h3 data-i18n="s2">پرستار در بیمارستان</h3><p data-i18n="d2">همراهی و مراقبت دوران بستری</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','مراقبت از سالمند')"><span class="srv-ic">🧓</span><h3 data-i18n="s3">مراقبت از سالمند</h3><p data-i18n="d3">همراهی روزانه و مراقبت ویژه</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','مراقبت پس از جراحی')"><span class="srv-ic">🩹</span><h3 data-i18n="s4">مراقبت پس از جراحی</h3><p data-i18n="d4">پانسمان و پیگیری نقاهت</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','بیماری‌های مزمن')"><span class="srv-ic">💊</span><h3 data-i18n="s5">بیماری‌های مزمن</h3><p data-i18n="d5">مدیریت دارو طبق دستور پزشک</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','بیماران کم‌تحرک')"><span class="srv-ic">♿</span><h3 data-i18n="s6">بیماران کم‌تحرک</h3><p data-i18n="d6">پیشگیری از زخم بستر</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','مراقبت از کودک')"><span class="srv-ic">🧒</span><h3 data-i18n="s7">مراقبت از کودک</h3><p data-i18n="d7">توسط نیروی ارزیابی‌شده</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','مراقبت شبانه')"><span class="srv-ic">🌙</span><h3 data-i18n="s8">شبانه و ۲۴ ساعته</h3><p data-i18n="d8">شیفت شب و شبانه‌روزی</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','ساعتی و روزانه')"><span class="srv-ic">⏱</span><h3 data-i18n="s9">ساعتی و روزانه</h3><p data-i18n="d9">زمان‌بندی منعطف و موردی</p></div>
+        <div class="srv-item" onclick="openSheet('urgentSheet','همراه بیمار')"><span class="srv-ic">🤝</span><h3 data-i18n="s10">همراه بیمار</h3><p data-i18n="d10">همراهی در مراجعات درمانی</p></div>
+      </div>
+    </section>
+
+    <!-- گردشگری سلامت -->
+    <section class="tourism-card" id="tourism-sec">
+      <span class="sec-badge" style="background:#fff;color:var(--blue);margin-bottom:8px;display:inline-block">NERSIKA HEALTH TOURISM</span>
+      <h3 data-i18n="tour_t">✈️ گردشگری سلامت در ایران</h3>
+      <p data-i18n="tour_d">ویژه بیماران داخلی و بین‌المللی: مشاوره پزشکی، برآورد هزینه، رزرو بیمارستان، اقامت، مترجم و ترانسفر فرودگاهی.</p>
+      <button type="button" class="btn-full btn-blue" onclick="openSheet('tourismSheet')" data-i18n="btn_enter_tourism">ثبت درخواست گردشگری سلامت</button>
+    </section>
+
+    <!-- مراحل ثبت درخواست (اسکرول افقی اپلیکیشنی) -->
+    <section>
+      <div class="sec-head">
+        <h2 data-i18n="how_t">مراحل دریافت خدمت</h2>
+        <span class="sec-badge">۵ گام ساده</span>
+      </div>
+      <div class="h-scroll">
+        <div class="step-card"><span class="step-num">۱</span><h3 data-i18n="h1t">ثبت درخواست</h3><p data-i18n="h1d">تکمیل اطلاعات بیمار، نوع خدمت، زمان و مکان</p></div>
+        <div class="step-card"><span class="step-num">۲</span><h3 data-i18n="h2t">بررسی و تطبیق</h3><p data-i18n="h2d">انتخاب پرستار واجد شرایط توسط کارشناس</p></div>
+        <div class="step-card"><span class="step-num">۳</span><h3 data-i18n="h3t">پیشنهاد و تأیید</h3><p data-i18n="h3d">مشاهده مشخصات پرستار و تأیید نهایی شما</p></div>
+        <div class="step-card"><span class="step-num">۴</span><h3 data-i18n="h4t">پرداخت امن</h3><p data-i18n="h4d">پرداخت از درگاه مجاز و دریافت رسید</p></div>
+        <div class="step-card"><span class="step-num">۵</span><h3 data-i18n="h5t">شروع مراقبت</h3><p data-i18n="h5d">ثبت حضور، گزارش روزانه و امتیازدهی</p></div>
+      </div>
+    </section>
+
+    <!-- بنر دوم -->
+    <img class="app-banner" src="assets/banner-3.webp" loading="lazy" alt="تیم پرستاری نرسیکا">
+
+    <!-- سوالات متداول -->
+    <section id="faq-sec">
+      <div class="sec-head">
+        <h2 data-i18n="faq_t">پرسش‌های متداول</h2>
+      </div>
+      <details><summary data-i18n="q1">درخواست فوری با اورژانس چه فرقی دارد؟</summary><p data-i18n="a1">درخواست فوری برای اعزام سریع پرستار است. در شرایط تهدیدکننده حیات فوراً با ۱۱۵ تماس بگیرید.</p></details>
+      <details><summary data-i18n="q2">اطلاعات پزشکی بیمار محرمانه است؟</summary><p data-i18n="a2">بله، پرستار فقط به اطلاعات ضروری برای انجام مراقبت دسترسی دارد.</p></details>
+      <details><summary data-i18n="q3">پرستاران چگونه تأیید می‌شوند؟</summary><p data-i18n="a3">پس از احراز هویت، بررسی مدارک تحصیلی و مجوز، آزمون علمی و ارزیابی عملی تایید می‌شوند.</p></details>
+    </section>
+
+    <!-- کارت اطلاعات دفتر مرکزی و پشتیبانی -->
+    <section class="info-card" id="contact-sec">
+      <div style="font-weight:800;font-size:.95rem;color:#fff;margin-bottom:8px">📍 دفتر مرکزی و پشتیبانی نرسیکا</div>
+      <div class="info-row">
+        <span id="addressText">تهران، دانشگاه صنعتی شریف، مرکز نوآوری انرژی</span>
+        <button type="button" class="copy-pill" onclick="copyText('addressText')">کپی آدرس</button>
+      </div>
+      <div class="info-row">
+        <span>کد پستی: <b id="postalText" dir="ltr">1458889694</b></span>
+        <button type="button" class="copy-pill" onclick="copyText('postalText')">کپی کد</button>
+      </div>
+      <div class="info-row">
+        <span>تلفن ثابت:</span>
+        <a href="tel:02128424742" dir="ltr" style="color:#fde047;font-weight:700">021-28424742</a>
+      </div>
+      <div class="info-row">
+        <span>شماره همراه:</span>
+        <a href="tel:01914968979" dir="ltr" style="color:#6ee7b7;font-weight:700">01914968979</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- نوار ناوبری پایین اپلیکیشن (Bottom Navigation Bar) -->
+  <nav class="bottom-nav" aria-label="App Navigation">
+    <a href="#home-sec" class="nav-tab active" onclick="setActiveTab(this)">
+      <span class="ic-tab">🏠</span>
+      <span>خانه</span>
+    </a>
+    <a href="#services-sec" class="nav-tab" onclick="setActiveTab(this)">
+      <span class="ic-tab">🩺</span>
+      <span>خدمات</span>
+    </a>
+    <button type="button" class="nav-tab-center" onclick="openSheet('urgentSheet')">
+      <div class="center-fab">🚨</div>
+      <span>ثبت فوری</span>
+    </button>
+    <a href="#tourism-sec" class="nav-tab" onclick="setActiveTab(this)">
+      <span class="ic-tab">✈️</span>
+      <span>گردشگری</span>
+    </a>
+    <button type="button" class="nav-tab" onclick="openSheet('authSheet')">
+      <span class="ic-tab">👤</span>
+      <span>حساب من</span>
+    </button>
+  </nav>
+</div>
+
+<!-- پاپ‌آپ کشویی ۱: ثبت درخواست پرستار -->
+<div class="sheet-overlay" id="urgentSheet" onclick="closeSheetOnBg(event, this)">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>🚨 ثبت درخواست پرستار / مراقب</h3>
+      <button type="button" class="sheet-close" onclick="closeSheet('urgentSheet')">×</button>
+    </div>
+    <form onsubmit="submitAppForm(event, 'urgentSheet', 'درخواست پرستار شما ثبت شد. کارشناس نرسیکا تا دقایقی دیگر تماس می‌گیرد.')">
+      <div class="f-group">
+        <label>نوع خدمت مورد نیاز *</label>
+        <input type="text" id="selectedServiceInput" class="f-input" placeholder="مثلاً: پرستار در منزل / مراقبت سالمند" required>
+      </div>
+      <div class="f-group">
+        <label>نام و نام خانوادگی درخواست‌کننده *</label>
+        <input type="text" class="f-input" placeholder="نام کامل خود را وارد کنید" required>
+      </div>
+      <div class="f-group">
+        <label>شماره موبایل *</label>
+        <input type="tel" class="f-input" dir="ltr" placeholder="09120000000" required>
+      </div>
+      <div class="f-group">
+        <label>شهر و محدوده سکونت / نام بیمارستان *</label>
+        <input type="text" class="f-input" placeholder="مثلاً: تهران، سعادت‌آباد" required>
+      </div>
+      <div class="f-group">
+        <label>توضیحات وضعیت بیمار (اختیاری)</label>
+        <textarea class="f-input" rows="2" placeholder="نیازهای خاص، شیفت روزانه یا شبانه..."></textarea>
+      </div>
+      <button type="submit" class="btn-full btn-red">تأیید و ارسال درخواست فوری</button>
+    </form>
+  </div>
+</div>
+
+<!-- پاپ‌آپ کشویی ۲: گردشگری سلامت -->
+<div class="sheet-overlay" id="tourismSheet" onclick="closeSheetOnBg(event, this)">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>✈️ درخواست گردشگری سلامت</h3>
+      <button type="button" class="sheet-close" onclick="closeSheet('tourismSheet')">×</button>
+    </div>
+    <form onsubmit="submitAppForm(event, 'tourismSheet', 'درخواست گردشگری سلامت شما ثبت شد. تیم بین‌الملل با شما ارتباط می‌گیرد.')">
+      <div class="f-group">
+        <label>نام بیمار / همراه *</label>
+        <input type="text" class="f-input" required>
+      </div>
+      <div class="f-group">
+        <label>شماره واتساپ یا تماس *</label>
+        <input type="tel" class="f-input" dir="ltr" placeholder="+98 / +964 / +90..." required>
+      </div>
+      <div class="f-group">
+        <label>تخصص درمانی مورد نظر *</label>
+        <select class="f-input">
+          <option>جراحی زیبایی و ترمیمی</option>
+          <option>قلب و عروق</option>
+          <option>ارتوپدی و ستون فقرات</option>
+          <option>ناباروری (IVF)</option>
+          <option>چشم‌پزشکی و دندانپزشکی</option>
+          <option>سایر موارد درمانی</option>
+        </select>
+      </div>
+      <button type="submit" class="btn-full btn-blue">دریافت مشاوره و برآورد هزینه</button>
+    </form>
+  </div>
+</div>
+
+<!-- پاپ‌آپ کشویی ۳: همکاری پرستاران -->
+<div class="sheet-overlay" id="nurseSheet" onclick="closeSheetOnBg(event, this)">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>🩺 ثبت‌نام همکاری پرستاران</h3>
+      <button type="button" class="sheet-close" onclick="closeSheet('nurseSheet')">×</button>
+    </div>
+    <form onsubmit="submitAppForm(event, 'nurseSheet', 'اطلاعات همکاری شما ثبت شد. لینک آزمون و احراز هویت پیامک خواهد شد.')">
+      <div class="f-group">
+        <label>نام و نام خانوادگی *</label>
+        <input type="text" class="f-input" required>
+      </div>
+      <div class="f-group">
+        <label>شماره موبایل *</label>
+        <input type="tel" class="f-input" dir="ltr" placeholder="09120000000" required>
+      </div>
+      <div class="f-group">
+        <label>مدرک تحصیلی / تخصص *</label>
+        <select class="f-input">
+          <option>کارشناس پرستاری</option>
+          <option>کارشناس ارشد پرستاری</option>
+          <option>بهیار / کمک‌بهیار</option>
+          <option>مراقب سالمند و کودک دارای گواهی</option>
+        </select>
+      </div>
+      <div class="f-group">
+        <label>شماره نظام پرستاری (در صورت وجود)</label>
+        <input type="text" class="f-input" dir="ltr">
+      </div>
+      <button type="submit" class="btn-full btn-teal">شروع فرآیند ارزیابی و همکاری</button>
+    </form>
+  </div>
+</div>
+
+<!-- پاپ‌آپ کشویی ۴: ورود و ثبت‌نام -->
+<div class="sheet-overlay" id="authSheet" onclick="closeSheetOnBg(event, this)">
+  <div class="sheet-box">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head">
+      <h3>👤 ورود به حساب کاربری نرسیکا</h3>
+      <button type="button" class="sheet-close" onclick="closeSheet('authSheet')">×</button>
+    </div>
+    <form onsubmit="submitAppForm(event, 'authSheet', 'کد تأیید پیامکی به شماره شما ارسال شد.')">
+      <div class="f-group">
+        <label>شماره تلفن همراه *</label>
+        <input type="tel" class="f-input" dir="ltr" placeholder="09120000000" required>
+      </div>
+      <button type="submit" class="btn-full btn-teal">ارسال کد ورود یک‌بار مصرف</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// مدیریت باز و بسته شدن Bottom Sheet ها
+function openSheet(id, serviceName) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (serviceName && document.getElementById('selectedServiceInput')) {
+    document.getElementById('selectedServiceInput').value = serviceName;
+  }
+  el.classList.add('active');
+  document.body.classList.add('modal-open');
+}
+
+function closeSheet(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.classList.remove('active');
+  document.body.classList.remove('modal-open');
+}
+
+function closeSheetOnBg(e, el) {
+  if (e.target === el) {
+    el.classList.remove('active');
+    document.body.classList.remove('modal-open');
+  }
+}
+
+// جستجوی سریع از صفحه اصلی
+function handleServiceSearch(e) {
+  e.preventDefault();
+  const val = document.getElementById('svc').value;
+  openSheet('urgentSheet', val);
+}
+
+// ارسال فرم‌ها و نمایش پیام اپلیکیشنی
+function submitAppForm(e, sheetId, msg) {
+  e.preventDefault();
+  closeSheet(sheetId);
+  showToast(msg);
+  e.target.reset();
+}
+
+// پیام Toast بالای صفحه
+function showToast(text) {
+  const t = document.getElementById('toast');
+  t.innerText = text;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// کپی آدرس و کد پستی
+function copyText(id) {
+  const txt = document.getElementById(id).innerText;
+  navigator.clipboard.writeText(txt).then(() => {
+    showToast('کپی شد: ' + txt);
+  });
+}
+
+// تغییر وضعیت تب فعال در نوار پایین
+function setActiveTab(el) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// تغییر زبان و جهت صفحه
+function setLanguage(lang, btn) {
+  document.querySelectorAll('.lang-chip').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.documentElement.dir = (lang === 'fa' || lang === 'ar') ? 'rtl' : 'ltr';
+  document.documentElement.lang = lang;
+  showToast('زبان برنامه تغییر کرد: ' + btn.innerText);
+}
+</script>
+</body>
+</html>

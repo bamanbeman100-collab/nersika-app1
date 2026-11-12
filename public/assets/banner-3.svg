@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" width="100%" height="auto" direction="rtl">
+  <defs>
+    <linearGradient id="bgGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#12284c" />
+      <stop offset="60%" stop-color="#163b6d" />
+      <stop offset="100%" stop-color="#0a7471" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="220" rx="20" fill="url(#bgGrad2)" />
+
+  <!-- Shield & Trust badge on left in RTL -->
+  <g transform="translate(130, 110)">
+    <circle r="60" fill="#ffffff" fill-opacity="0.08" />
+    <circle r="42" fill="#1e3a8a" stroke="#60a5fa" stroke-width="2" />
+    <path d="M-10 2 l7 8 l16 -16" fill="none" stroke="#67e8f9" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+
+  <g transform="translate(750, 42)">
+    <rect x="-140" y="0" width="140" height="26" rx="13" fill="#2563eb" fill-opacity="0.3" stroke="#60a5fa" stroke-width="1" />
+    <text x="-70" y="18" text-anchor="middle" font-family="'Vazirmatn', sans-serif" font-weight="700" font-size="12" fill="#93c5fd">ضمانت کیفیت و بیمه</text>
+    
+    <text x="0" y="56" text-anchor="start" font-family="'Vazirmatn', sans-serif" font-weight="900" font-size="24" fill="#ffffff">پشتیبانی ۲۴ ساعته و جایگزینی بدون وقفه پرستار</text>
+    <text x="0" y="88" text-anchor="start" font-family="'Vazirmatn', sans-serif" font-weight="500" font-size="14" fill="#cbd5e1">در صورت عدم رضایت در ۲ ساعت اول، پرستار بدون هزینه مضاعف تغییر می‌یابد.</text>
+    
+    <g transform="translate(0, 108)">
+      <text x="0" y="15" text-anchor="start" font-family="'Vazirmatn', sans-serif" font-weight="700" font-size="13" fill="#fde047">★ رضایت ۹۸.۴٪ بیش از ۱۲،۰۰۰ خانواده در سال گذشته</text>
+    </g>
+  </g>
+</svg>

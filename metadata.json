@@ -1,0 +1,6 @@
+{
+  "name": "نرسیکا - سامانه خدمات پرستاری و گردشگری سلامت",
+  "description": "پلتفرم جامع و هوشمند اعزام پرستار در منزل و بیمارستان و خدمات گردشگری سلامت بین‌المللی نرسیکا",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
