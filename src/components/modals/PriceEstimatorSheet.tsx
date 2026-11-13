@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { X, Calculator, ShieldCheck, Check, Sparkles } from 'lucide-react';
+import { X, Calculator, Sparkles } from 'lucide-react';
 import { Language } from '../../types';
 import { translations } from '../../utils/i18n';
 import { calculateServiceCost, formatToman } from '../../utils/pricing';
-import { SERVICES_LIST } from '../../data/servicesData';
+import { SERVICES_BASE_LIST } from '../../data/servicesData';
 
 interface PriceEstimatorSheetProps {
   isOpen: boolean;
@@ -20,7 +20,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
 }) => {
   const t = translations[currentLang];
 
-  const [selectedServiceId, setSelectedServiceId] = useState(SERVICES_LIST[0].id);
+  const [selectedServiceId, setSelectedServiceId] = useState(SERVICES_BASE_LIST[0].id);
   const [shift, setShift] = useState<'daily' | 'night' | '24h' | 'hourly'>('daily');
   const [daysCount, setDaysCount] = useState<number>(1);
   const [isUrgent, setIsUrgent] = useState(false);
@@ -28,7 +28,8 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
 
   if (!isOpen) return null;
 
-  const currentService = SERVICES_LIST.find((s) => s.id === selectedServiceId) || SERVICES_LIST[0];
+  const currentService = SERVICES_BASE_LIST.find((s) => s.id === selectedServiceId) || SERVICES_BASE_LIST[0];
+  const localizedService = t.services[currentService.id] || { title: currentService.id, desc: '', unit: '' };
 
   const totalCost = calculateServiceCost({
     basePrice: currentService.basePrice,
@@ -39,7 +40,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
   });
 
   const handleBookNow = () => {
-    onBookWithEstimate(currentService.titleKey, shift, daysCount);
+    onBookWithEstimate(localizedService.title, shift, daysCount);
     onClose();
   };
 
@@ -62,10 +63,10 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-slate-900">
-                {t.calculatorTitle}
+                {t.estimatorModalTitle}
               </h3>
               <span className="text-[11px] text-teal-700 font-semibold block">
-                محاسبه شفاف و رسمی طبق تعرفه‌های مصوب وزارت بهداشت
+                {t.estimatorModalSub}
               </span>
             </div>
           </div>
@@ -82,33 +83,31 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
           {/* Service Selector */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              انتخاب خدمت بالینی یا مراقبتی:
+              {t.selectServiceEstimateLabel}
             </label>
             <select
               value={selectedServiceId}
               onChange={(e) => setSelectedServiceId(e.target.value)}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all cursor-pointer font-medium"
             >
-              {SERVICES_LIST.map((srv) => (
-                <option key={srv.id} value={srv.id}>
-                  {srv.icon} {srv.titleKey} - پایه: {formatToman(srv.basePrice, currentLang)}
-                </option>
-              ))}
+              {SERVICES_BASE_LIST.map((srv) => {
+                const srvTitle = t.services[srv.id]?.title || srv.id;
+                return (
+                  <option key={srv.id} value={srv.id}>
+                    {srv.icon} {srvTitle} - {t.startingPricePrefix} {formatToman(srv.basePrice, currentLang)}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
           {/* Shift selector */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.shiftSelect}:
+              {t.shiftSelectLabel}:
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-              {[
-                { id: 'daily', label: 'روزانه (۸-۱۲س)' },
-                { id: 'night', label: 'شبانه (+۲۵٪)' },
-                { id: '24h', label: '۲۴ ساعته' },
-                { id: 'hourly', label: 'ساعتی' },
-              ].map((s) => (
+              {t.shifts.map((s) => (
                 <button
                   key={s.id}
                   type="button"
@@ -128,8 +127,8 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
           {/* Days count slider / buttons */}
           <div>
             <div className="flex items-center justify-between text-xs font-bold text-slate-700 mb-1">
-              <span>مدت زمان مراقبت:</span>
-              <span className="text-teal-800 font-extrabold">{daysCount} روز</span>
+              <span>{t.careDurationLabel}</span>
+              <span className="text-teal-800 font-extrabold">{daysCount} {t.daysUnit}</span>
             </div>
             <div className="flex items-center gap-1.5">
               {[1, 3, 7, 14, 30].map((num) => (
@@ -143,7 +142,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
                       : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                   }`}
                 >
-                  {num} روز
+                  {num} {t.daysUnit}
                 </button>
               ))}
             </div>
@@ -153,7 +152,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
           <div className="space-y-2 pt-1">
             <label className="flex items-center justify-between p-2.5 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
               <span className="text-xs font-bold text-slate-800">
-                مراقبت تخصصی / ویژه (گاواژ، سوند، زخم بستر)
+                {t.specialCareCheckbox}
               </span>
               <input
                 type="checkbox"
@@ -165,7 +164,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
 
             <label className="flex items-center justify-between p-2.5 bg-rose-50/70 rounded-xl border border-rose-200 cursor-pointer">
               <span className="text-xs font-bold text-rose-900">
-                اعزام فوری و اورژانسی (کمتر از ۴۵ دقیقه)
+                {t.urgentDispatchCheckbox}
               </span>
               <input
                 type="checkbox"
@@ -179,16 +178,16 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
           {/* Result card */}
           <div className="bg-gradient-to-br from-teal-900 to-slate-900 text-white rounded-2xl p-4 shadow-md">
             <div className="flex items-center justify-between text-xs text-teal-200 mb-1">
-              <span>برآورد نهایی هزینه:</span>
+              <span>{t.finalEstimateLabel}</span>
               <span className="text-[10px] bg-teal-500/30 text-teal-300 px-2 py-0.5 rounded-full border border-teal-400/20">
-                شامل بیمه و پشتیبانی کامل
+                {t.insuranceDispatchIncluded}
               </span>
             </div>
             <div className="text-xl sm:text-2xl font-black text-white my-1">
               {formatToman(totalCost, currentLang)}
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed mb-3">
-              فاکتور رسمی جهت ارائه به کلیه شرکت‌های بیمه پایه و تکمیلی صادر می‌گردد.
+              {t.invoiceGuaranteeNote}
             </p>
 
             <button
@@ -197,7 +196,7 @@ export const PriceEstimatorSheet: React.FC<PriceEstimatorSheetProps> = ({
               className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-teal-500 hover:bg-teal-400 text-slate-950 shadow-md transition-all active:scale-98 flex items-center justify-center gap-1.5"
             >
               <Sparkles className="w-4 h-4 text-slate-950" />
-              <span>ثبت درخواست با این برآورد</span>
+              <span>{t.bookWithEstimateBtn}</span>
             </button>
           </div>
         </div>

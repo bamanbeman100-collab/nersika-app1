@@ -33,7 +33,10 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs px-3 sm:px-4 py-2.5">
       <div className="flex items-center justify-between gap-2">
         {/* Brand */}
-        <div className="flex items-center gap-2.5 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <div
+          className="flex items-center gap-2.5 cursor-pointer"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-600 to-slate-900 flex items-center justify-center text-white shadow-xs shrink-0 p-1">
             <ShieldCheck className="w-6 h-6 text-teal-300" />
           </div>
@@ -41,11 +44,11 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="font-black text-slate-900 text-lg sm:text-xl tracking-tight leading-tight flex items-center gap-1.5">
               <span>{t.appName}</span>
               <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-teal-50 text-teal-700 border border-teal-200">
-                PRO
+                {t.appBadge}
               </span>
             </div>
             <div className="text-[11px] font-semibold text-teal-700 leading-none mt-0.5">
-              {t.heroTitleHighlight}
+              {t.brandSlogan}
             </div>
           </div>
         </div>

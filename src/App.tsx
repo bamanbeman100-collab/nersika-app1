@@ -17,7 +17,6 @@ import { PriceEstimatorSheet } from './components/modals/PriceEstimatorSheet';
 import {
   Language,
   TabType,
-  ServiceItem,
   NursingRequest,
   TourismRequest,
   NurseApplication,
@@ -29,10 +28,12 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
+  const t = translations[lang];
+
   // User state
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userPhone, setUserPhone] = useState('09121234567');
-  const [userName, setUserName] = useState('کاربر نرسیکا');
+  const [userName, setUserName] = useState('');
 
   // Orders & Requests state
   const [orders, setOrders] = useState<NursingRequest[]>([
@@ -55,7 +56,7 @@ export default function App() {
 
   // Modals state
   const [isUrgentOpen, setIsUrgentOpen] = useState(false);
-  const [selectedServiceForUrgent, setSelectedServiceForUrgent] = useState('پرستار در منزل');
+  const [selectedServiceForUrgent, setSelectedServiceForUrgent] = useState('');
   const [isTourismOpen, setIsTourismOpen] = useState(false);
   const [isNurseCoopOpen, setIsNurseCoopOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -72,7 +73,7 @@ export default function App() {
     setToastMsg(msg);
     setTimeout(() => {
       setToastMsg((prev) => (prev === msg ? null : prev));
-    }, 3200);
+    }, 3500);
   };
 
   const handleLanguageChange = (newLang: Language) => {
@@ -84,19 +85,21 @@ export default function App() {
       tr: 'Türkçe',
       ru: 'Русский',
     };
-    showToast(`زبان برنامه تغییر کرد: ${langNames[newLang]}`);
+    const toastByLang: Record<Language, string> = {
+      fa: `زبان برنامه تغییر کرد: ${langNames[newLang]}`,
+      ar: `تم تغيير لغة التطبيق إلى: ${langNames[newLang]}`,
+      en: `Application language switched to: ${langNames[newLang]}`,
+      tr: `Uygulama dili değiştirildi: ${langNames[newLang]}`,
+      ru: `Язык приложения изменен на: ${langNames[newLang]}`,
+    };
+    showToast(toastByLang[newLang]);
   };
 
   const handleCopyText = (text: string, label: string) => {
     navigator.clipboard.writeText(text).then(
-      () => showToast(`کپی شد: ${text}`),
-      () => showToast(`کپی شد: ${text}`)
+      () => showToast(`${t.copiedToast} ${text}`),
+      () => showToast(`${t.copiedToast} ${text}`)
     );
-  };
-
-  const handleSelectServiceFromGrid = (service: ServiceItem) => {
-    setSelectedServiceForUrgent(service.titleKey);
-    setIsUrgentOpen(true);
   };
 
   const handleSelectServiceAndOpen = (serviceName: string) => {
@@ -109,7 +112,7 @@ export default function App() {
     shift: 'daily' | 'night' | '24h' | 'hourly',
     days: number
   ) => {
-    setSelectedServiceForUrgent(`${serviceName} (${days} روز)`);
+    setSelectedServiceForUrgent(`${serviceName} (${days} ${t.daysUnit})`);
     setIsUrgentOpen(true);
   };
 
@@ -118,13 +121,13 @@ export default function App() {
       ...data,
       id: `req-${Date.now().toString().slice(-4)}`,
       status: 'matching',
-      createdAt: 'همین الان',
+      createdAt: 'Just now',
     };
     setOrders((prev) => [newRequest, ...prev]);
     setIsLoggedIn(true);
     setUserPhone(data.phone);
     setUserName(data.requesterName);
-    showToast('درخواست پرستار شما با موفقیت ثبت شد. کارشناس تریاژ تا دقایقی دیگر تماس می‌گیرد.');
+    showToast(t.urgentSuccessToast);
   };
 
   const handleTourismSubmit = (data: Omit<TourismRequest, 'id' | 'status' | 'createdAt'>) => {
@@ -132,10 +135,10 @@ export default function App() {
       ...data,
       id: `tour-${Date.now().toString().slice(-4)}`,
       status: 'received',
-      createdAt: 'همین الان',
+      createdAt: 'Just now',
     };
     setTourismOrders((prev) => [newTourism, ...prev]);
-    showToast('درخواست گردشگری سلامت شما ثبت شد. تیم بین‌الملل با شما ارتباط برقرار خواهد کرد.');
+    showToast(t.tourismSuccessToast);
   };
 
   const handleNurseSubmit = (data: Omit<NurseApplication, 'id' | 'status' | 'createdAt'>) => {
@@ -143,10 +146,10 @@ export default function App() {
       ...data,
       id: `nurse-${Date.now().toString().slice(-4)}`,
       status: 'under_review',
-      createdAt: 'همین الان',
+      createdAt: 'Just now',
     };
     setNurseApps((prev) => [newApp, ...prev]);
-    showToast('اطلاعات همکاری شما ثبت شد. لینک آزمون علمی و احراز هویت پیامک خواهد شد.');
+    showToast(t.nurseSuccessToast);
   };
 
   const handleTabChange = (tab: TabType) => {
@@ -185,7 +188,7 @@ export default function App() {
             currentLang={lang}
             onSelectServiceAndOpen={handleSelectServiceAndOpen}
             onOpenUrgent={() => {
-              setSelectedServiceForUrgent('پرستار در منزل');
+              setSelectedServiceForUrgent(t.quickOptions[0]?.label || 'Home Nursing');
               setIsUrgentOpen(true);
             }}
             onOpenNurseCoop={() => setIsNurseCoopOpen(true)}
@@ -205,7 +208,7 @@ export default function App() {
           {/* Services Grid (10 active services) */}
           <ServicesGrid
             currentLang={lang}
-            onSelectService={handleSelectServiceFromGrid}
+            onSelectService={handleSelectServiceAndOpen}
           />
 
           {/* Health Tourism Section */}
@@ -242,7 +245,7 @@ export default function App() {
           currentTab={activeTab}
           onTabChange={handleTabChange}
           onOpenUrgent={() => {
-            setSelectedServiceForUrgent('پرستار در منزل');
+            setSelectedServiceForUrgent(t.quickOptions[0]?.label || 'Home Nursing');
             setIsUrgentOpen(true);
           }}
           currentLang={lang}
@@ -283,11 +286,11 @@ export default function App() {
             setIsLoggedIn(true);
             setUserPhone(phone);
             setUserName(name);
-            showToast(`خوش آمدید، ${name}`);
+            showToast(`${t.welcomeUser} ${name}`);
           }}
           onLogout={() => {
             setIsLoggedIn(false);
-            showToast('با موفقیت از حساب کاربری خارج شدید.');
+            showToast(t.logoutSuccess);
           }}
           orders={orders}
           tourismOrders={tourismOrders}

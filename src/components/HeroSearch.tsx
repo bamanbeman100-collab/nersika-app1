@@ -23,21 +23,21 @@ export const HeroSearch: React.FC<HeroSearchProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSelectServiceAndOpen(selectedService || 'پرستار در منزل');
+    const fallback = t.quickOptions[0]?.value || 'Home Nursing';
+    onSelectServiceAndOpen(selectedService || fallback);
   };
 
   return (
     <div className="flex flex-col gap-3">
       {/* Hero Gradient Card */}
       <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-[#163b6d] to-teal-800 text-white p-4 sm:p-5 shadow-lg">
-        {/* Subtle decorative glow circles */}
         <div className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-teal-400/20 blur-2xl pointer-events-none" />
         <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-blue-500/20 blur-xl pointer-events-none" />
 
         <div className="relative z-10">
           <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10 backdrop-blur-xs text-teal-300 text-[11px] font-semibold mb-2.5 border border-white/15">
             <Sparkles className="w-3 h-3 text-teal-300" />
-            <span>پلتفرم تخصصی خدمات بالینی در محل</span>
+            <span>{t.heroBadge}</span>
           </div>
 
           <h1 className="text-xl sm:text-2xl font-black leading-snug mb-1.5">
@@ -61,13 +61,11 @@ export const HeroSearch: React.FC<HeroSearchProps> = ({
                 className="w-full bg-transparent text-xs sm:text-sm text-slate-800 font-medium py-1.5 outline-hidden cursor-pointer"
               >
                 <option value="">{t.quickSearchSelect}</option>
-                <option value="پرستار در منزل">پرستار در منزل</option>
-                <option value="مراقبت از سالمند">مراقبت از سالمند</option>
-                <option value="مراقبت پس از جراحی">مراقبت پس از جراحی</option>
-                <option value="همراه بیمار در بیمارستان">همراه بیمار در بیمارستان</option>
-                <option value="مراقبت از کودک">مراقبت از کودک</option>
-                <option value="مراقبت شبانه">مراقبت شبانه و ۲۴ ساعته</option>
-                <option value="تزریقات و پانسمان در منزل">تزریقات و پانسمان در منزل</option>
+                {t.quickOptions.map((opt) => (
+                  <option key={opt.value} value={opt.label}>
+                    {opt.label}
+                  </option>
+                ))}
               </select>
             </div>
             <button
@@ -80,14 +78,14 @@ export const HeroSearch: React.FC<HeroSearchProps> = ({
 
           {/* Price Estimator Button Pill */}
           <div className="mt-3 flex items-center justify-between text-[11px] text-teal-100/90 pt-2 border-t border-white/10">
-            <span>میانگین زمان اعزام: کمتر از ۴۵ دقیقه</span>
+            <span>{t.avgDispatchTime}</span>
             <button
               type="button"
               onClick={onOpenEstimator}
               className="inline-flex items-center gap-1 text-teal-200 hover:text-white underline underline-offset-4 font-semibold active:opacity-75"
             >
               <Calculator className="w-3.5 h-3.5" />
-              <span>استعلام و محاسبه آنلاین هزینه</span>
+              <span>{t.openEstimatorLink}</span>
             </button>
           </div>
         </div>

@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { ChevronDown, HelpCircle } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../utils/i18n';
-import { FAQ_LIST } from '../data/servicesData';
 
 interface FaqSectionProps {
   currentLang: Language;
@@ -26,7 +25,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
       </div>
 
       <div className="flex flex-col gap-2">
-        {FAQ_LIST.map((item, idx) => {
+        {t.faqs.map((item, idx) => {
           const isOpen = openIndex === idx;
           return (
             <div
@@ -47,7 +46,7 @@ export const FaqSection: React.FC<FaqSectionProps> = ({ currentLang }) => {
                 />
               </button>
               {isOpen && (
-                <div className="px-3 pb-3 sm:px-3.5 sm:pb-3.5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-2.5 animate-fadeIn">
+                <div className="px-3 pb-3 sm:px-3.5 sm:pb-3.5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-2.5">
                   {item.a}
                 </div>
               )}

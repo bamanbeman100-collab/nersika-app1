@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { X, Stethoscope, Award, FileCheck2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Stethoscope, Award, FileCheck2, Mail } from 'lucide-react';
 import { Language, NurseApplication } from '../../types';
 import { translations } from '../../utils/i18n';
 import { validateIranianPhone, validateRequired } from '../../utils/validation';
+import { sendFormToEmail } from '../../utils/api';
 
 interface NurseCooperationSheetProps {
   isOpen: boolean;
@@ -21,41 +22,54 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
 
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
-  const [degree, setDegree] = useState('کارشناس پرستاری');
+  const [degree, setDegree] = useState('');
   const [medicalCouncilCode, setMedicalCouncilCode] = useState('');
-  const [city, setCity] = useState('تهران');
-  const [experienceYears, setExperienceYears] = useState('۳ تا ۵ سال');
+  const [city, setCity] = useState('');
+  const [experienceYears, setExperienceYears] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (t.degrees.length > 0 && !degree) {
+      setDegree(t.degrees[0]);
+    }
+    if (t.experienceOptions.length > 0 && !experienceYears) {
+      setExperienceYears(t.experienceOptions[1] || t.experienceOptions[0]);
+    }
+  }, [t, degree, experienceYears]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!validateRequired(fullName)) {
-      setErrorMsg('لطفاً نام و نام خانوادگی را وارد کنید.');
+      setErrorMsg(t.errNameRequired);
       return;
     }
     if (!validateIranianPhone(phone)) {
-      setErrorMsg('شماره موبایل نامعتبر است (مثال: 09121234567).');
+      setErrorMsg(t.errPhoneInvalid);
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit({
-        fullName,
-        phone,
-        degree,
-        medicalCouncilCode,
-        city,
-        experienceYears,
-      });
-      setIsSubmitting(false);
-      onClose();
-    }, 400);
+
+    const payload = {
+      fullName,
+      phone,
+      degree: degree || t.degrees[0],
+      medicalCouncilCode,
+      city: city || 'Tehran',
+      experienceYears: experienceYears || t.experienceOptions[0],
+    };
+
+    // Forward form to info@nersika.com
+    await sendFormToEmail('nurse_application', payload);
+
+    onSubmit(payload);
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
@@ -77,10 +91,10 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-slate-900">
-                {t.nurseFormTitle}
+                {t.nurseModalTitle}
               </h3>
               <span className="text-[11px] text-teal-700 font-semibold block">
-                استخدام و عضویت در بزرگترین شبکه خدمات بالینی
+                {t.nurseModalSub}
               </span>
             </div>
           </div>
@@ -93,6 +107,12 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
           </button>
         </div>
 
+        {/* Target Email Dispatch Badge */}
+        <div className="flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-800 text-[11px] px-3 py-1.5 rounded-xl font-bold mb-3">
+          <Mail className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+          <span>{t.emailSentBadge}: <b>info@nersika.com</b></span>
+        </div>
+
         {errorMsg && (
           <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-2.5 mb-3 font-medium">
             {errorMsg}
@@ -102,13 +122,13 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.fullName} *
+              {t.fullNameLabel} *
             </label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="نام و نام خانوادگی کامل"
+              placeholder={t.fullNamePlaceholder}
               required
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
             />
@@ -117,7 +137,7 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.mobileNumber} *
+                {t.mobileLabel} *
               </label>
               <input
                 type="tel"
@@ -132,13 +152,13 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                شهر محل فعالیت *
+                {t.cityAreaLabel} *
               </label>
               <input
                 type="text"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                placeholder="مثلاً: تهران، کرج، شیراز، مشهد..."
+                placeholder={t.nurseCityPlaceholder}
                 required
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
               />
@@ -154,42 +174,43 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
               onChange={(e) => setDegree(e.target.value)}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all cursor-pointer"
             >
-              <option value="کارشناس پرستاری">کارشناس پرستاری (BSN)</option>
-              <option value="کارشناس ارشد پرستاری">کارشناس ارشد پرستاری (MSN - ویژه/داخلی جراحی)</option>
-              <option value="بهیار / کمک‌بهیار">بهیار / کمک‌بهیار دارای دیپلم بهیاری</option>
-              <option value="کارشناس اتاق عمل و هوشبری">کارشناس اتاق عمل و هوشبری</option>
-              <option value="مراقب سالمند و کودک دارای گواهی">مراقب سالمند و کودک دارای گواهی فنی‌حرفه‌ای</option>
+              {t.degrees.map((deg) => (
+                <option key={deg} value={deg}>
+                  {deg}
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.nurseCouncilCode}
+                {t.councilCodeLabel}
               </label>
               <input
                 type="text"
                 dir="ltr"
                 value={medicalCouncilCode}
                 onChange={(e) => setMedicalCouncilCode(e.target.value)}
-                placeholder="مثلاً 123456"
+                placeholder={t.councilCodePlaceholder}
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all font-mono"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                سابقه کار بالینی
+                {t.experienceLabel}
               </label>
               <select
                 value={experienceYears}
                 onChange={(e) => setExperienceYears(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all cursor-pointer"
               >
-                <option value="کمتر از ۱ سال">کمتر از ۱ سال (شروع همکاری)</option>
-                <option value="۱ تا ۳ سال">۱ تا ۳ سال</option>
-                <option value="۳ تا ۵ سال">۳ تا ۵ سال</option>
-                <option value="بیش از ۵ سال">بیش از ۵ سال (ارشد بالینی)</option>
+                {t.experienceOptions.map((exp) => (
+                  <option key={exp} value={exp}>
+                    {exp}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -197,8 +218,8 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
           <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 leading-relaxed flex items-start gap-2">
             <Award className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <div>
-              <span className="font-bold block">مزایای همکاری با نرسیکا:</span>
-              تسویه روزانه و شفاف، پوشش کامل بیمه حوادث بالینی، انتخاب شیفت آزاد و پرونده‌های نزدیک به محل سکونت.
+              <span className="font-bold block">{t.nurseBenefitsTitle}</span>
+              {t.nurseBenefitsText}
             </div>
           </div>
 
@@ -208,7 +229,7 @@ export const NurseCooperationSheet: React.FC<NurseCooperationSheetProps> = ({
             className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-teal-700 hover:bg-teal-800 text-white shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
           >
             <FileCheck2 className="w-4 h-4" />
-            <span>{isSubmitting ? 'در حال ثبت پرونده...' : t.submitNurse}</span>
+            <span>{isSubmitting ? t.submittingText : t.submitNurseBtn}</span>
           </button>
         </form>
       </div>

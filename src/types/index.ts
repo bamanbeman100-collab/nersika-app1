@@ -5,12 +5,8 @@ export type TabType = 'home' | 'services' | 'urgent' | 'tourism' | 'account';
 export interface ServiceItem {
   id: string;
   icon: string;
-  titleKey: string;
-  descKey: string;
   category: 'home' | 'hospital' | 'specialized' | 'shift';
-  badge?: string;
   basePrice: number; // in Tomans
-  unit: string;
 }
 
 export interface NursingRequest {

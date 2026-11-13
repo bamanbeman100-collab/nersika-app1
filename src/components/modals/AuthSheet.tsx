@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, User, Phone, KeyRound, CheckCircle2, Clock, ShieldCheck, LogOut, FileText } from 'lucide-react';
+import { X, User, KeyRound, Clock, LogOut } from 'lucide-react';
 import { Language, NursingRequest, TourismRequest } from '../../types';
 import { translations } from '../../utils/i18n';
 import { validateIranianPhone } from '../../utils/validation';
@@ -37,7 +37,6 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
   const [otpStep, setOtpStep] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
-  const [activeTab, setActiveTab] = useState<'profile' | 'orders'>('orders');
 
   if (!isOpen) return null;
 
@@ -45,7 +44,7 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
     e.preventDefault();
     setErrorMsg('');
     if (!validateIranianPhone(phoneInput)) {
-      setErrorMsg('لطفاً شماره تلفن همراه ۱۱ رقمی معتبر وارد کنید (مثال: 09121234567).');
+      setErrorMsg(t.errPhoneInvalid);
       return;
     }
     setOtpStep(true);
@@ -54,10 +53,10 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!otpCode || otpCode.length < 4) {
-      setErrorMsg('لطفاً کد تأیید ۴ رقمی را وارد کنید (کد تست: 1234).');
+      setErrorMsg('Please enter a 4-digit verification code (Use 1234 for test)');
       return;
     }
-    onLogin(phoneInput, nameInput || 'کاربر نرسیکا');
+    onLogin(phoneInput, nameInput || t.userGreeting);
     setOtpStep(false);
   };
 
@@ -80,10 +79,10 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-slate-900">
-                {isLoggedIn ? 'حساب کاربری و پیگیری سفارشات' : 'ورود / عضویت سریع'}
+                {isLoggedIn ? t.authModalTitleLoggedIn : t.authModalTitle}
               </h3>
               <span className="text-[11px] text-teal-700 font-semibold block">
-                سامانه هوشمند مانیتورینگ بالینی نرسیکا
+                {t.authModalSub}
               </span>
             </div>
           </div>
@@ -103,30 +102,29 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
         )}
 
         {!isLoggedIn ? (
-          // Login Form
           <div>
             {!otpStep ? (
               <form onSubmit={handleSendOtp} className="space-y-3">
                 <p className="text-xs text-slate-600 leading-relaxed mb-2">
-                  برای مشاهده وضعیت اعزام پرستار، پیگیری قرارداد و فاکتورها، شماره موبایل خود را وارد نمایید.
+                  {t.authLoginDesc}
                 </p>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    نام شما (اختیاری)
+                    {t.yourNameOptional}
                   </label>
                   <input
                     type="text"
                     value={nameInput}
                     onChange={(e) => setNameInput(e.target.value)}
-                    placeholder="مثلاً: علی رضایی"
+                    placeholder={t.yourNamePlaceholder}
                     className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
                   />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    شماره تلفن همراه *
+                    {t.mobileLabel} *
                   </label>
                   <input
                     type="tel"
@@ -144,20 +142,18 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
                   className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-teal-700 hover:bg-teal-800 text-white shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
                 >
                   <KeyRound className="w-4 h-4" />
-                  <span>ارسال کد ورود یک‌بار مصرف</span>
+                  <span>{t.sendOtpBtn}</span>
                 </button>
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp} className="space-y-3">
                 <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 text-xs text-teal-800">
-                  <span>کد تأیید به شماره </span>
-                  <b dir="ltr" className="font-mono">{phoneInput}</b>
-                  <span> پیامک شد. (برای تست می‌توانید 1234 را وارد نمایید).</span>
+                  {t.otpNotice}
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    کد تأیید پیامک‌شده *
+                    {t.otpCodeLabel} *
                   </label>
                   <input
                     type="text"
@@ -177,30 +173,28 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
                     onClick={() => setOtpStep(false)}
                     className="flex-1 py-2 px-3 rounded-xl font-semibold text-xs text-slate-600 bg-slate-100 hover:bg-slate-200"
                   >
-                    تغییر شماره
+                    {t.changePhoneBtn}
                   </button>
                   <button
                     type="submit"
                     className="flex-2 py-2 px-3 rounded-xl font-bold text-xs bg-teal-700 hover:bg-teal-800 text-white shadow-md"
                   >
-                    تأیید و ورود به حساب
+                    {t.verifyLoginBtn}
                   </button>
                 </div>
               </form>
             )}
           </div>
         ) : (
-          // Logged-in State: Profile & Orders
           <div className="space-y-3">
-            {/* User badge */}
             <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-full bg-teal-700 text-white flex items-center justify-center font-bold text-sm">
-                  {userName ? userName[0] : 'ک'}
+                  {userName ? userName[0] : 'U'}
                 </div>
                 <div>
                   <span className="font-bold text-xs sm:text-sm text-slate-900 block leading-tight">
-                    {userName || 'کاربر گرامی'}
+                    {userName || t.userGreeting}
                   </span>
                   <span dir="ltr" className="text-[11px] font-mono text-slate-500 block mt-0.5">
                     {userPhone}
@@ -213,22 +207,21 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
                 className="text-xs text-rose-600 hover:text-rose-700 font-bold flex items-center gap-1 bg-rose-50 hover:bg-rose-100 px-2.5 py-1.5 rounded-lg transition-colors"
               >
                 <LogOut className="w-3.5 h-3.5" />
-                <span>خروج</span>
+                <span>{t.logoutBtn}</span>
               </button>
             </div>
 
-            {/* Orders list */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h4 className="font-bold text-xs sm:text-sm text-slate-800">
-                  درخواست‌های فعال و سوابق ({orders.length + tourismOrders.length})
+                  {t.activeOrdersTitle} ({orders.length + tourismOrders.length})
                 </h4>
               </div>
 
               {orders.length === 0 && tourismOrders.length === 0 ? (
                 <div className="bg-slate-50 border border-dashed border-slate-200 rounded-xl p-5 text-center text-xs text-slate-500">
                   <Clock className="w-6 h-6 text-slate-400 mx-auto mb-1.5 opacity-70" />
-                  <span>هنوز درخواستی ثبت نکرده‌اید. با کلیک بر روی دکمه ثبت فوری، نخستین درخواست خود را ثبت نمایید.</span>
+                  <span>{t.noOrdersDesc}</span>
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -240,11 +233,11 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
                       <div className="flex items-start justify-between gap-1 mb-1.5">
                         <span className="font-bold text-slate-900">{ord.serviceName}</span>
                         <span className="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">
-                          در حال بررسی و تطبیق
+                          {t.statusReviewing}
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-500 space-y-0.5">
-                        <div>بیمار: {ord.requesterName} ({ord.location})</div>
+                        <div>{ord.requesterName} ({ord.location})</div>
                         <div className="flex items-center justify-between pt-1 border-t border-slate-100 mt-1">
                           <span className="font-semibold text-teal-800">
                             {formatToman(ord.estimatedPrice, currentLang)}
@@ -261,13 +254,13 @@ export const AuthSheet: React.FC<AuthSheetProps> = ({
                       className="bg-blue-50/50 border border-blue-200 rounded-xl p-3 text-xs shadow-2xs"
                     >
                       <div className="flex items-start justify-between gap-1 mb-1.5">
-                        <span className="font-bold text-blue-900">گردشگری سلامت: {tOrd.specialty}</span>
+                        <span className="font-bold text-blue-900">{tOrd.specialty}</span>
                         <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full">
-                          هماهنگی پرونده IPD
+                          {t.statusIpd}
                         </span>
                       </div>
                       <div className="text-[11px] text-slate-600">
-                        <div>بیمار: {tOrd.patientName} ({tOrd.country})</div>
+                        <div>{tOrd.patientName} ({tOrd.country})</div>
                         <div className="text-[10px] text-slate-400 mt-1">{tOrd.createdAt}</div>
                       </div>
                     </div>

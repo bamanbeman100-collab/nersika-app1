@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Siren, Clock, MapPin, User, Phone, FileText, CheckCircle2 } from 'lucide-react';
+import { X, Siren, Mail } from 'lucide-react';
 import { Language, NursingRequest } from '../../types';
 import { translations } from '../../utils/i18n';
 import { validateIranianPhone, validateRequired } from '../../utils/validation';
 import { calculateServiceCost, formatToman } from '../../utils/pricing';
+import { sendFormToEmail } from '../../utils/api';
 
 interface UrgentRequestSheetProps {
   isOpen: boolean;
@@ -17,12 +18,12 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
   isOpen,
   onClose,
   currentLang,
-  initialService = 'پرستار در منزل',
+  initialService = '',
   onSubmit,
 }) => {
   const t = translations[currentLang];
 
-  const [serviceName, setServiceName] = useState(initialService);
+  const [serviceName, setServiceName] = useState('');
   const [requesterName, setRequesterName] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
@@ -34,53 +35,58 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
   useEffect(() => {
     if (initialService) {
       setServiceName(initialService);
+    } else {
+      setServiceName(t.quickOptions[0]?.label || 'Home Nursing');
     }
-  }, [initialService]);
+  }, [initialService, t]);
 
   if (!isOpen) return null;
 
-  // Real-time calculated estimate
   const estimatedPrice = calculateServiceCost({
     basePrice: 650000,
     shift: shift,
     isUrgent: true,
   });
 
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!validateRequired(serviceName)) {
-      setErrorMsg('لطفاً نوع خدمت را مشخص کنید.');
+      setErrorMsg(t.errServiceRequired);
       return;
     }
     if (!validateRequired(requesterName)) {
-      setErrorMsg('لطفاً نام و نام خانوادگی را وارد کنید.');
+      setErrorMsg(t.errNameRequired);
       return;
     }
     if (!validateIranianPhone(phone)) {
-      setErrorMsg('شماره موبایل وارد شده معتبر نیست (مثال: 09121234567)');
+      setErrorMsg(t.errPhoneInvalid);
       return;
     }
     if (!validateRequired(location)) {
-      setErrorMsg('لطفاً شهر و محدوده سکونت یا نام بیمارستان را وارد کنید.');
+      setErrorMsg(t.errLocationRequired);
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit({
-        serviceName,
-        requesterName,
-        phone,
-        location,
-        shift,
-        notes,
-        estimatedPrice,
-      });
-      setIsSubmitting(false);
-      onClose();
-    }, 400);
+
+    const payload = {
+      serviceName,
+      requesterName,
+      phone,
+      location,
+      shift,
+      notes,
+      estimatedPrice,
+    };
+
+    // Forward form to info@nersika.com via server
+    await sendFormToEmail('urgent_nurse_request', payload);
+
+    onSubmit(payload);
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
@@ -92,7 +98,6 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
         className="w-full max-w-[540px] bg-white rounded-t-3xl sm:rounded-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 shadow-2xl animate-in slide-in-from-bottom duration-200"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Top Handle for mobile */}
         <div className="w-10 h-1 bg-slate-200 rounded-full mx-auto mb-3 sm:hidden" />
 
         {/* Modal Header */}
@@ -103,10 +108,10 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-slate-900">
-                {t.urgentBtn}
+                {t.urgentModalTitle}
               </h3>
               <span className="text-[11px] text-teal-700 font-semibold block">
-                هماهنگی و اعزام سریع در کمتر از ۴۵ دقیقه
+                {t.urgentModalSub}
               </span>
             </div>
           </div>
@@ -119,6 +124,12 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           </button>
         </div>
 
+        {/* Target Email Dispatch Badge */}
+        <div className="flex items-center gap-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] px-3 py-1.5 rounded-xl font-bold mb-3">
+          <Mail className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <span>{t.emailSentBadge}: <b>info@nersika.com</b></span>
+        </div>
+
         {errorMsg && (
           <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-2.5 mb-3 font-medium">
             {errorMsg}
@@ -129,13 +140,13 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           {/* Service Name */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.serviceType} *
+              {t.serviceTypeLabel} *
             </label>
             <input
               type="text"
               value={serviceName}
               onChange={(e) => setServiceName(e.target.value)}
-              placeholder="مثلاً: پرستار در منزل، مراقبت از سالمند..."
+              placeholder={t.serviceTypePlaceholder}
               required
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
             />
@@ -145,23 +156,21 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.fullName} *
+                {t.fullNameLabel} *
               </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={requesterName}
-                  onChange={(e) => setRequesterName(e.target.value)}
-                  placeholder="نام و نام خانوادگی"
-                  required
-                  className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
-                />
-              </div>
+              <input
+                type="text"
+                value={requesterName}
+                onChange={(e) => setRequesterName(e.target.value)}
+                placeholder={t.fullNamePlaceholder}
+                required
+                className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
+              />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.mobileNumber} *
+                {t.mobileLabel} *
               </label>
               <input
                 type="tel"
@@ -178,15 +187,10 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           {/* Shift Selection */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.shiftSelect} *
+              {t.shiftSelectLabel} *
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
-              {[
-                { id: 'daily', label: 'روزانه (۸-۱۲س)' },
-                { id: 'night', label: 'شبانه (۱۲س)' },
-                { id: '24h', label: '۲۴ ساعته' },
-                { id: 'hourly', label: 'ساعتی / موردی' },
-              ].map((s) => (
+              {t.shifts.map((s) => (
                 <button
                   key={s.id}
                   type="button"
@@ -206,13 +210,13 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           {/* Location */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.cityArea} *
+              {t.cityAreaLabel} *
             </label>
             <input
               type="text"
               value={location}
               onChange={(e) => setLocation(e.target.value)}
-              placeholder="مثلاً: تهران، سعادت‌آباد یا بیمارستان آتیه"
+              placeholder={t.cityAreaPlaceholder}
               required
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all"
             />
@@ -221,13 +225,13 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           {/* Patient notes */}
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.patientStatusNotes}
+              {t.notesLabel}
             </label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="سابقه بیماری، داروهای خاص، نیاز به سونداژ، تعویض پانسمان و..."
+              placeholder={t.notesPlaceholder}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-teal-500 focus:outline-hidden transition-all resize-none"
             />
           </div>
@@ -235,13 +239,15 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
           {/* Live Price Estimation Box */}
           <div className="bg-slate-50 border border-slate-200 rounded-xl p-3 flex items-center justify-between text-xs">
             <div>
-              <span className="text-slate-500 block text-[11px]">برآورد اولیه هزینه شیفت انتخابی:</span>
+              <span className="text-slate-500 block text-[11px]">
+                {t.estimateInitialLabel}
+              </span>
               <span className="font-extrabold text-teal-800 text-sm">
                 {formatToman(estimatedPrice, currentLang)}
               </span>
             </div>
             <span className="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
-              شامل بیمه و اعزام فوری
+              {t.insuranceDispatchIncluded}
             </span>
           </div>
 
@@ -251,7 +257,7 @@ export const UrgentRequestSheet: React.FC<UrgentRequestSheetProps> = ({
             className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-rose-600 hover:bg-rose-700 text-white shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
           >
             <Siren className="w-4 h-4" />
-            <span>{isSubmitting ? 'در حال ثبت پرونده...' : t.submitUrgent}</span>
+            <span>{isSubmitting ? t.submittingText : t.submitUrgentBtn}</span>
           </button>
         </form>
       </div>

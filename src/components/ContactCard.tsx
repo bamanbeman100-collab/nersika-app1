@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Smartphone, Copy, Check } from 'lucide-react';
+import { MapPin, Phone, Smartphone, Copy } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../utils/i18n';
 
@@ -10,7 +10,6 @@ interface ContactCardProps {
 
 export const ContactCard: React.FC<ContactCardProps> = ({ currentLang, onCopyText }) => {
   const t = translations[currentLang];
-  const addressText = 'تهران، دانشگاه صنعتی شریف، مرکز نوآوری انرژی';
   const postalCode = '1458889694';
 
   return (
@@ -24,22 +23,22 @@ export const ContactCard: React.FC<ContactCardProps> = ({ currentLang, onCopyTex
         {/* Address */}
         <div className="py-2.5 flex items-center justify-between gap-2">
           <span className="text-slate-300 leading-relaxed text-[11px] sm:text-xs">
-            {addressText}
+            {t.addressText}
           </span>
           <button
             type="button"
-            onClick={() => onCopyText(addressText, t.copyAddress)}
+            onClick={() => onCopyText(t.addressText, t.copyAddress)}
             className="flex-none bg-teal-600/90 hover:bg-teal-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
           >
             <Copy className="w-3 h-3" />
-            <span>{t.copyAddress}</span>
+            <span>{t.copyBtn}</span>
           </button>
         </div>
 
         {/* Postal Code */}
         <div className="py-2.5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-slate-300">
-            <span className="text-slate-400">کد پستی:</span>
+            <span className="text-slate-400">{t.postalCodeLabel}</span>
             <span dir="ltr" className="font-mono font-bold text-white tracking-wider">
               {postalCode}
             </span>
@@ -50,7 +49,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({ currentLang, onCopyTex
             className="flex-none bg-teal-600/90 hover:bg-teal-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold flex items-center gap-1 transition-all active:scale-95"
           >
             <Copy className="w-3 h-3" />
-            <span>{t.copyPostal}</span>
+            <span>{t.copyBtn}</span>
           </button>
         </div>
 
@@ -73,7 +72,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({ currentLang, onCopyTex
               onClick={() => onCopyText('02128424742', t.phoneLandline)}
               className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2 py-0.5 rounded text-[10px] font-bold"
             >
-              کپی
+              {t.copyBtn}
             </button>
           </div>
         </div>
@@ -97,7 +96,7 @@ export const ContactCard: React.FC<ContactCardProps> = ({ currentLang, onCopyTex
               onClick={() => onCopyText('09194968979', t.phoneMobile)}
               className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white px-2 py-0.5 rounded text-[10px] font-bold"
             >
-              کپی
+              {t.copyBtn}
             </button>
           </div>
         </div>

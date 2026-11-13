@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { X, Plane, Globe, Send, ShieldCheck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, Plane, Send, ShieldCheck, Mail } from 'lucide-react';
 import { Language, TourismRequest } from '../../types';
 import { translations } from '../../utils/i18n';
 import { validateInternationalPhone, validateRequired } from '../../utils/validation';
-import { TOURISM_SPECIALTIES } from '../../data/servicesData';
+import { sendFormToEmail } from '../../utils/api';
 
 interface TourismSheetProps {
   isOpen: boolean;
@@ -22,39 +22,52 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
 
   const [patientName, setPatientName] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
-  const [country, setCountry] = useState('عراق (Iraq)');
-  const [specialty, setSpecialty] = useState(TOURISM_SPECIALTIES[0].title);
+  const [country, setCountry] = useState('');
+  const [specialty, setSpecialty] = useState('');
   const [notes, setNotes] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  useEffect(() => {
+    if (t.countries.length > 0 && !country) {
+      setCountry(t.countries[0]);
+    }
+    if (t.specialties.length > 0 && !specialty) {
+      setSpecialty(t.specialties[0].title);
+    }
+  }, [t, country, specialty]);
+
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
 
     if (!validateRequired(patientName)) {
-      setErrorMsg('لطفاً نام بیمار یا همراه را وارد کنید.');
+      setErrorMsg(t.errNameRequired);
       return;
     }
     if (!validateInternationalPhone(whatsapp)) {
-      setErrorMsg('شماره واتساپ یا تماس بین‌المللی نامعتبر است (مثال: +9647801234567).');
+      setErrorMsg(t.errWhatsappInvalid);
       return;
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit({
-        patientName,
-        whatsapp,
-        country,
-        specialty,
-        notes,
-      });
-      setIsSubmitting(false);
-      onClose();
-    }, 400);
+
+    const payload = {
+      patientName,
+      whatsapp,
+      country: country || t.countries[0],
+      specialty: specialty || t.specialties[0]?.title,
+      notes,
+    };
+
+    // Forward form to info@nersika.com
+    await sendFormToEmail('tourism_request', payload);
+
+    onSubmit(payload);
+    setIsSubmitting(false);
+    onClose();
   };
 
   return (
@@ -76,10 +89,10 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
             </div>
             <div>
               <h3 className="font-black text-sm sm:text-base text-slate-900">
-                {t.tourismFormTitle}
+                {t.tourismModalTitle}
               </h3>
               <span className="text-[11px] text-blue-700 font-semibold block">
-                مشاوره پزشکی رایگان، برآورد هزینه و پکیج VIP
+                {t.tourismModalSub}
               </span>
             </div>
           </div>
@@ -92,6 +105,12 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
           </button>
         </div>
 
+        {/* Target Email Dispatch Badge */}
+        <div className="flex items-center gap-1.5 bg-blue-50 border border-blue-200 text-blue-800 text-[11px] px-3 py-1.5 rounded-xl font-bold mb-3">
+          <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+          <span>{t.emailSentBadge}: <b>info@nersika.com</b></span>
+        </div>
+
         {errorMsg && (
           <div className="bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl p-2.5 mb-3 font-medium">
             {errorMsg}
@@ -101,13 +120,13 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.patientName} *
+              {t.patientNameLabel} *
             </label>
             <input
               type="text"
               value={patientName}
               onChange={(e) => setPatientName(e.target.value)}
-              placeholder="نام و نام خانوادگی بیمار"
+              placeholder={t.patientNamePlaceholder}
               required
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-hidden transition-all"
             />
@@ -116,7 +135,7 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                {t.whatsappContact} *
+                {t.whatsappLabel} *
               </label>
               <input
                 type="tel"
@@ -131,35 +150,32 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                کشور مبدأ / محل اقامت *
+                {t.countryLabel} *
               </label>
               <select
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
                 className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-hidden transition-all cursor-pointer"
               >
-                <option value="عراق (Iraq)">عراق (Iraq)</option>
-                <option value="عمان (Oman)">عمان (Oman)</option>
-                <option value="امارات (UAE)">امارات (UAE)</option>
-                <option value="کویت (Kuwait)">کویت (Kuwait)</option>
-                <option value="ترکیه (Turkey)">ترکیه (Turkey)</option>
-                <option value="آذربایجان (Azerbaijan)">آذربایجان (Azerbaijan)</option>
-                <option value="روسیه (Russia)">روسیه (Russia)</option>
-                <option value="سایر کشورها">سایر کشورها (Other Countries)</option>
+                {t.countries.map((cntry) => (
+                  <option key={cntry} value={cntry}>
+                    {cntry}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              {t.medicalSpecialty} *
+              {t.medicalSpecialtyLabel} *
             </label>
             <select
               value={specialty}
               onChange={(e) => setSpecialty(e.target.value)}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-hidden transition-all cursor-pointer"
             >
-              {TOURISM_SPECIALTIES.map((spec) => (
+              {t.specialties.map((spec) => (
                 <option key={spec.id} value={spec.title}>
                   {spec.title}
                 </option>
@@ -169,22 +185,20 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              توضیحات و خلاصه شرح حال پزشکی (اختیاری)
+              {t.notesLabel}
             </label>
             <textarea
               rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="ارسال مدارک، آزمایش‌ها، عکس‌ها و اولویت زمان سفر در واتساپ هماهنگ خواهد شد..."
+              placeholder={t.tourismNotesPlaceholder}
               className="w-full px-3 py-2 text-xs sm:text-sm bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-hidden transition-all resize-none"
             />
           </div>
 
           <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3 flex items-start gap-2 text-xs text-blue-900">
             <ShieldCheck className="w-4 h-4 text-blue-700 shrink-0 mt-0.5" />
-            <span>
-              کلیه خدمات با مجوز رسمی وزارت بهداشت و تحت نظارت مستقیم دپارتمان بیماران بین‌الملل (IPD) انجام می‌پذیرد.
-            </span>
+            <span>{t.ipdNotice}</span>
           </div>
 
           <button
@@ -193,7 +207,7 @@ export const TourismSheet: React.FC<TourismSheetProps> = ({
             className="w-full py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white shadow-md transition-all active:scale-98 flex items-center justify-center gap-2"
           >
             <Send className="w-4 h-4" />
-            <span>{isSubmitting ? 'در حال ارسال...' : t.submitTourism}</span>
+            <span>{isSubmitting ? t.submittingText : t.submitTourismBtn}</span>
           </button>
         </form>
       </div>

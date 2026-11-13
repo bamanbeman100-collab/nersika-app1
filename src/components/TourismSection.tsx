@@ -1,8 +1,7 @@
 import React from 'react';
-import { Plane, Globe, Shield, Hotel, Sparkles, Stethoscope } from 'lucide-react';
+import { Plane, Globe, Stethoscope, Sparkles, Hotel } from 'lucide-react';
 import { Language } from '../types';
 import { translations } from '../utils/i18n';
-import { TOURISM_SPECIALTIES } from '../data/servicesData';
 
 interface TourismSectionProps {
   currentLang: Language;
@@ -15,6 +14,13 @@ export const TourismSection: React.FC<TourismSectionProps> = ({
 }) => {
   const t = translations[currentLang];
 
+  const icons = [
+    <Stethoscope key="1" className="w-4 h-4" />,
+    <Sparkles key="2" className="w-4 h-4" />,
+    <Globe key="3" className="w-4 h-4" />,
+    <Hotel key="4" className="w-4 h-4" />,
+  ];
+
   return (
     <section
       id="tourism-sec"
@@ -26,7 +32,7 @@ export const TourismSection: React.FC<TourismSectionProps> = ({
         </span>
         <div className="flex items-center gap-1 text-[11px] font-bold text-blue-700">
           <Globe className="w-3.5 h-3.5" />
-          <span>پذیرش بین‌المللی IPD</span>
+          <span>{t.healthTourismIPD}</span>
         </div>
       </div>
 
@@ -41,40 +47,25 @@ export const TourismSection: React.FC<TourismSectionProps> = ({
 
       {/* Feature highlights grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
-        <div className="bg-white/80 backdrop-blur-xs rounded-xl p-2 border border-blue-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
-            <Stethoscope className="w-4 h-4" />
+        {t.tourismAdvantages.map((adv, idx) => (
+          <div key={idx} className="bg-white/80 backdrop-blur-xs rounded-xl p-2 border border-blue-100 flex items-center gap-2">
+            <div className="w-7 h-7 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0">
+              {icons[idx] || <Globe className="w-4 h-4" />}
+            </div>
+            <span className="text-[11px] font-bold text-slate-800 leading-tight">
+              {adv.title}
+            </span>
           </div>
-          <span className="text-[11px] font-bold text-slate-800 leading-tight">پزشکان فوق‌تخصص</span>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-xs rounded-xl p-2 border border-blue-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center shrink-0">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-800 leading-tight">تا ۷۰٪ صرفه‌جویی</span>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-xs rounded-xl p-2 border border-blue-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center shrink-0">
-            <Globe className="w-4 h-4" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-800 leading-tight">مترجم همزمان ۲۴/۷</span>
-        </div>
-
-        <div className="bg-white/80 backdrop-blur-xs rounded-xl p-2 border border-blue-100 flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
-            <Hotel className="w-4 h-4" />
-          </div>
-          <span className="text-[11px] font-bold text-slate-800 leading-tight">هتل و ترانسفر VIP</span>
-        </div>
+        ))}
       </div>
 
       {/* Specialties list pills */}
       <div className="mb-4">
-        <span className="text-[11px] font-bold text-slate-500 block mb-1.5">زمینه‌های تخصصی دارای اولویت:</span>
+        <span className="text-[11px] font-bold text-slate-500 block mb-1.5">
+          {t.prioritySpecialtiesLabel}
+        </span>
         <div className="flex flex-wrap gap-1.5">
-          {TOURISM_SPECIALTIES.map((spec) => (
+          {t.specialties.map((spec) => (
             <span
               key={spec.id}
               className="text-[11px] font-medium bg-white text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 shadow-2xs"
